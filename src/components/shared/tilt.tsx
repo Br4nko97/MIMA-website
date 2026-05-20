@@ -3,6 +3,7 @@
 import { type ReactNode, useRef } from "react";
 import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils/cn";
 
 interface TiltProps {
@@ -24,6 +25,10 @@ export function Tilt({
 }: TiltProps) {
   const ref = useRef<HTMLDivElement>(null);
   const reducedMotion = usePrefersReducedMotion();
+  const hasFinePointer = useMediaQuery("(pointer: fine)");
+
+  // No-op on touch / reduced motion — no tilt math, no glare gradient, no motion subscriptions
+  const interactive = hasFinePointer && !reducedMotion;
 
   const mx = useMotionValue(0.5);
   const my = useMotionValue(0.5);
@@ -37,7 +42,7 @@ export function Tilt({
   const glareBg = useMotionTemplate`radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.85), transparent 40%)`;
 
   function onMove(e: React.PointerEvent<HTMLDivElement>) {
-    if (reducedMotion) return;
+    if (!interactive) return;
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -50,7 +55,13 @@ export function Tilt({
     my.set(0.5);
   }
 
-  const showGlare = glare && !reducedMotion;
+  if (!interactive) {
+    return (
+      <div ref={ref} className={cn("relative", className)}>
+        <div className={cn("relative h-full w-full", innerClassName)}>{children}</div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -64,14 +75,14 @@ export function Tilt({
     >
       <motion.div
         style={{
-          rotateX: reducedMotion ? 0 : springX,
-          rotateY: reducedMotion ? 0 : springY,
+          rotateX: springX,
+          rotateY: springY,
           transformStyle: "preserve-3d",
         }}
         className={cn("relative h-full w-full", innerClassName)}
       >
         {children}
-        {showGlare ? (
+        {glare ? (
           <motion.div
             aria-hidden
             className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-30 mix-blend-overlay"

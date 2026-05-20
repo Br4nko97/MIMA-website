@@ -43,8 +43,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="relative min-h-screen pt-24">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 pb-20 md:grid-cols-[240px,1fr]">
+    <div className="relative min-h-screen pt-20 md:pt-24">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 pb-20 md:gap-8 md:px-6 md:grid-cols-[240px,1fr]">
         <aside className="hidden md:block">
           <div className="sticky top-28 space-y-1">
             <div className="mb-4 px-3">
@@ -96,7 +96,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Mobile top bar */}
-        <div className="-mx-6 mb-2 flex items-center gap-3 overflow-x-auto border-b border-[var(--color-line)] px-6 pb-3 md:hidden">
+        <div className="-mx-4 mb-3 flex items-center gap-2 overflow-x-auto border-b border-[var(--color-line)] px-4 pb-3 md:hidden">
           {LINKS.map((l) => {
             const active = l.exact ? pathname === l.href : pathname?.startsWith(l.href);
             return (

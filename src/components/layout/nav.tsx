@@ -128,7 +128,7 @@ export function Nav() {
                     : dict.nav.audioOn
                   : "Toggle audio"
               }
-              className="hidden h-9 w-9 items-center justify-center rounded-full border border-[var(--color-line)] text-[var(--color-fg-1)] transition-colors hover:border-[var(--color-line-strong)] hover:text-[var(--color-fg-0)] md:inline-flex"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-line)] text-[var(--color-fg-1)] transition-colors hover:border-[var(--color-line-strong)] hover:text-[var(--color-fg-0)]"
             >
               {mounted && audioEnabled ? (
                 <Volume2 className="h-3.5 w-3.5" />

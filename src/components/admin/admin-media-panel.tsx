@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GlassCard } from "@/components/shared/glass-card";
 import { ClassifiedTag } from "@/components/shared/classified-tag";
-import { deleteMedia } from "@/lib/admin/actions";
+import { deleteMedia, insertMedia } from "@/lib/admin/actions";
 import type { MediaRow, MediaType } from "@/lib/supabase/types";
 
 interface AdminMediaPanelProps {
@@ -30,13 +30,12 @@ export function AdminMediaPanel({ rows }: AdminMediaPanelProps) {
       fd.append("file", file);
       fd.append("bucket", "media");
       const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const json = await res.json();
-      if (!res.ok || !json.ok) {
+      const json = (await res.json()) as { ok: boolean; url?: string; error?: string };
+      if (!res.ok || !json.ok || !json.url) {
         toast.error(json.error || "Upload failed");
         return;
       }
 
-      // Determine type
       const mime = file.type || "";
       const type: MediaType = mime.startsWith("video")
         ? "video"
@@ -44,12 +43,25 @@ export function AdminMediaPanel({ rows }: AdminMediaPanelProps) {
           ? "audio"
           : "image";
 
-      // Insert into media table via server action wrapper — for brevity, call upload endpoint already returned URL.
-      // We'll surface the URL and ask user to copy into the JSON for now, OR we call an insert.
-      // Quick path: fetch a helper insert endpoint — kept simple via existing actions API.
-      toast.success("File caricato — URL: " + json.url);
-      // TODO: insert into `media` table — for now we surface the URL; admin can copy it into form fields.
-      void category; void caption;
+      const insertRes = await insertMedia({
+        type,
+        url: json.url,
+        thumb_url: type === "audio" ? null : json.url,
+        caption_it: caption || null,
+        caption_en: caption || null,
+        category,
+        tags: [category],
+      });
+
+      if (!insertRes.ok) {
+        toast.warning(
+          `File caricato ma record DB non creato: ${insertRes.error}. URL: ${json.url}`,
+        );
+        return;
+      }
+
+      toast.success("Media caricato e indicizzato");
+      setCaption("");
       router.refresh();
     } catch (e) {
       console.error(e);
@@ -113,17 +125,15 @@ export function AdminMediaPanel({ rows }: AdminMediaPanelProps) {
               />
               <Button asChild variant="aura" disabled={busy} type="button">
                 <span>
-                  <Upload className="h-4 w-4" /> {busy ? "…" : "Upload"}
+                  <Upload className="h-4 w-4" /> {busy ? "Uploading…" : "Upload"}
                 </span>
               </Button>
             </label>
           </div>
         </div>
         <p className="mt-4 text-xs text-[var(--color-fg-2)]">
-          Per ora l&apos;upload restituisce solo l&apos;URL del file su Supabase Storage. L&apos;inserimento
-          di un record nella tabella <code className="font-mono text-[var(--color-fg-0)]">media</code>{" "}
-          va completato da SQL editor o tramite la prossima iterazione. Il file è pubblicato
-          immediatamente.
+          File caricato su Supabase Storage e indicizzato automaticamente nella tabella
+          media — appare subito nella galleria pubblica.
         </p>
       </GlassCard>
 
@@ -132,6 +142,7 @@ export function AdminMediaPanel({ rows }: AdminMediaPanelProps) {
           <GlassCard key={m.id} className="overflow-hidden">
             <div className="relative aspect-square bg-[var(--color-bg-2)]">
               {m.type === "image" || m.type === "video" ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={m.thumb_url ?? m.url}
                   alt={m.caption_it ?? ""}

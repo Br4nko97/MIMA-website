@@ -91,9 +91,10 @@ export function MemberFormClient({ member }: MemberFormProps) {
         toast.error(res.error);
         return;
       }
-      // Also upsert stats if we have member id (only on edit; for new, we'd need the id back — simplified)
-      if (member?.id) {
-        const statRes = await upsertMemberStats({ member_id: member.id, ...stats });
+      // Save stats for any insert/update — upsertMember returns the resulting id
+      const memberId = member?.id ?? res.id;
+      if (memberId) {
+        const statRes = await upsertMemberStats({ member_id: memberId, ...stats });
         if (!statRes.ok) toast.warning(`Member saved but stats failed: ${statRes.error}`);
       }
       toast.success("Saved");
