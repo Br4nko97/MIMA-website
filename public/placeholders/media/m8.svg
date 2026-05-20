@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="g1" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="hsl(47 65% 55%)" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="hsl(47 65% 55%)" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g2" cx="75%" cy="80%" r="60%">
+      <stop offset="0%" stop-color="hsl(107 70% 45%)" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="hsl(107 70% 45%)" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0c0c11"/>
+      <stop offset="100%" stop-color="#1c1c26"/>
+    </linearGradient>
+    <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.1 0"/></filter>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bg)"/>
+  <rect width="100%" height="100%" fill="url(#g1)"/>
+  <rect width="100%" height="100%" fill="url(#g2)"/>
+  <rect width="100%" height="100%" filter="url(#noise)" opacity="0.35"/>
+  <text x="50%" y="92%" text-anchor="middle" font-family="ui-monospace, monospace" font-size="43" fill="rgba(255,255,255,0.4)" letter-spacing="3">MEDIA-8</text>
+</svg>
