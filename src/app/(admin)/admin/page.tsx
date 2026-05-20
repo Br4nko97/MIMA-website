@@ -8,7 +8,7 @@ import {
   getTimeline,
 } from "@/lib/data/queries";
 import { isAdminAvailable } from "@/lib/supabase/admin";
-import { getDbStatus } from "@/lib/admin/actions";
+import { getDbStatus } from "@/lib/admin/db-status";
 import { BootstrapButton } from "@/components/admin/bootstrap-button";
 import {
   Users,
